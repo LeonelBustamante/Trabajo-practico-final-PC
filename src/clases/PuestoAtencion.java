@@ -15,7 +15,7 @@ public class PuestoAtencion {
 
     private static final int MAX_PUESTO_ATENCION = 2;
 
-    private int cantidadPasajerosFila, cantidadPasajerosHall;
+    private int cantFila, cantHall;
     private final ArrayList<Pasajero> filaPuestoAtencion;
     private final Lock lock;
     private final Condition esperaHall;
@@ -26,8 +26,8 @@ public class PuestoAtencion {
     public PuestoAtencion(Recepcionista recepcionista) {
         this.recepcionista = recepcionista;
         this.filaPuestoAtencion = new ArrayList<>();
-        this.cantidadPasajerosFila = 0;
-        this.cantidadPasajerosHall = 0;
+        this.cantFila = 0;
+        this.cantHall = 0;
         this.lock = new ReentrantLock();
         this.esperaHall = lock.newCondition();
         this.pasajerosEnFila = lock.newCondition();
@@ -36,11 +36,11 @@ public class PuestoAtencion {
 
     // Metodos para Pasajero -------------------------------------------------------
     public void entrarFilaPuestoAtencion(Pasajero pasajero) {
-        // El pasajero entra a la fila del puesto de atencion
+        // Se utiliza un lock explicito con una condicion que indicara si el pasajero debe esperar en la sala de espera o no
         lock.lock();
         try {
-            cantidadPasajerosHall++;
-            while (cantidadPasajerosFila == MAX_PUESTO_ATENCION) {
+            cantHall++;
+            while (cantFila == MAX_PUESTO_ATENCION) {
                 try {
                     System.out.println(PrintColor.ANSI_RED + "[CLASE PUESTOATENCION] " + pasajero + " debe esperar en la sala de espera." + PrintColor.ANSI_RESET);
                     esperaHall.await();
@@ -49,15 +49,15 @@ public class PuestoAtencion {
             }
             System.out.println(PrintColor.ANSI_RED + "[CLASE PUESTOATENCION] " + pasajero + " ingreso a la fila del puesto de atencion." + PrintColor.ANSI_RESET);
             filaPuestoAtencion.add(pasajero);
-            cantidadPasajerosHall--;
-            cantidadPasajerosFila++;
+            cantHall--;
+            cantFila++;
         } finally {
             lock.unlock();
         }
     }
 
     public void entrarPuestoAtencion(Pasajero pasajero) {
-        // El pasajero entra al puesto de atencion
+        // Se utiliza un lock explicito con una condicion que indicara si el pasajero debe esperar en la fila o no
         lock.lock();
         try {
             while (filaPuestoAtencion.get(0) != pasajero) {
@@ -72,12 +72,12 @@ public class PuestoAtencion {
     }
 
     public void salirPuestoAtencion(Pasajero pasajero) {
-        // El pasajero sale del puesto de atencion
+        // Se utiliza un lock explicito y se notifica a los pasajeros en la fila y al recepcionista para que se activen
         lock.lock();
         try {
             System.out.println(PrintColor.ANSI_RED + "[CLASE PUESTOATENCION] " + pasajero + " salio del puesto de atencion." + PrintColor.ANSI_RESET);
             filaPuestoAtencion.remove(0);
-            cantidadPasajerosFila--;
+            cantFila--;
             pasajerosEnFila.signal();
             activarRecepcionista.signal();
         } finally {
@@ -87,10 +87,11 @@ public class PuestoAtencion {
 
     // Metodos para Recepcionista --------------------------------------------------
     public void hacerPasarPasajero() {
-        // El recepcionista hace pasar al primer pasajero de la fila
+        // Se utiliza un lock explicito con una condicion que lo hara esperar si no hay pasajeros en la sala de espera o si la fila esta llena, luego 
+        // notifica a los pasajeros en sala de espera para que se activen
         lock.lock();
         try {
-            while (cantidadPasajerosHall == 0 || cantidadPasajerosFila == MAX_PUESTO_ATENCION) {
+            while (cantHall == 0 || cantFila == MAX_PUESTO_ATENCION) {
                 try {
                     activarRecepcionista.await();
                 } catch (InterruptedException ex) {

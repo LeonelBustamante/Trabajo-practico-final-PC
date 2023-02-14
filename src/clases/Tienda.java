@@ -46,8 +46,7 @@ public class Tienda {
      */
     public Caja obtenerCaja(Pasajero pasajero) {
         Caja caja = cajas[new Random().nextInt(cajas.length)];
-        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " eligio la caja "
-                + caja.getId() + PrintColor.ANSI_RESET);
+        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " eligio la caja " + caja.getId() + PrintColor.ANSI_RESET);
         return caja;
     }
 
@@ -60,18 +59,17 @@ public class Tienda {
      * @param pasajero El pasajero que quiere entrar a la tienda
      */
     public synchronized void entrarTienda(Pasajero pasajero) {
+        // Metodo con lock implicito donde se utiliza al objeto this como lock
         while (personasAdentroTienda >= MAX_PERSONAS) {
             try {
-                System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero
-                        + " esta esperando a que se libere un lugar en la tienda" + PrintColor.ANSI_RESET);
+                System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " esta esperando a que se libere un lugar en la tienda" + PrintColor.ANSI_RESET);
                 wait();
             } catch (InterruptedException ex) {
                 System.out.println("Error en Tienda.entrarTienda: " + ex.getMessage());
             }
         }
         personasAdentroTienda++;
-        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " entro a la tienda"
-                + PrintColor.ANSI_RESET);
+        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " entro a la tienda" + PrintColor.ANSI_RESET);
     }
 
     /**
@@ -86,20 +84,16 @@ public class Tienda {
         Producto producto;
         int cantProductosCarritoCliente = new Random().nextInt(5);
 
-        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] "
-                + pasajero + " esta seleccionando productos" + PrintColor.ANSI_RESET);
+        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " esta seleccionando productos" + PrintColor.ANSI_RESET);
         for (int i = 0; i < cantProductosCarritoCliente; i++) {
             producto = this.productos[new Random().nextInt(MAX_PRODUCTOS)];
             synchronized (producto) {
+                // Bloque sincronizado que se ejecuta sobre el objeto producto para evitar que dos hilos consulten el stock al mismo tiempo
                 if (producto.getStock() > 0) {
-                    System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] "
-                            + pasajero + " agrego producto " + producto.getId() + " al carrito"
-                            + PrintColor.ANSI_RESET);
+                    System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " agrego producto " + producto.getId() + " al carrito" + PrintColor.ANSI_RESET);
                     carrito.add(producto);
                 } else {
-                    System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] "
-                            + pasajero + " no pudo agregar un producto al carrito porque no hay stock"
-                            + PrintColor.ANSI_RESET);
+                    System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " no pudo agregar un producto al carrito porque no hay stock" + PrintColor.ANSI_RESET);
                 }
             }
         }
@@ -112,8 +106,8 @@ public class Tienda {
      * @param pasajero El pasajero que quiere salir de la tienda
      */
     public synchronized void salirTienda(Pasajero pasajero) {
-        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] "
-                + pasajero + " salio de la tienda" + PrintColor.ANSI_RESET);
+        // Metodo con lock implicito que despertara al pasajero que estaba esperando
+        System.out.println(PrintColor.ANSI_GREEN_BACKGROUND + "[CLASE TIENDA] " + pasajero + " salio de la tienda" + PrintColor.ANSI_RESET);
         personasAdentroTienda--;
         notify();
     }

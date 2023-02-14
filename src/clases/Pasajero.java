@@ -59,16 +59,13 @@ public class Pasajero extends Persona implements Runnable {
 
             int horaActual = hora.addAndGet(0);
             if (((horaActual + 2 <= horaVuelo) || (horaActual > horaVuelo)) && quiereVerTienda) {
-                System.out.println(PrintColor.ANSI_PURPLE + "[CLASE PASAJERO]"
-                        + toString() + " esta viendo la tienda ..." + PrintColor.ANSI_RESET);
+                System.out.println(PrintColor.ANSI_PURPLE + "[CLASE PASAJERO]" + toString() + " esta viendo la tienda ..." + PrintColor.ANSI_RESET);
                 Thread.sleep(3000);
             } else {
-                System.out.println(PrintColor.ANSI_PURPLE + "[CLASE PASAJERO]" + toString()
-                        + " no va a ver la tienda porque no tiene tiempo o no quiere." + PrintColor.ANSI_RESET);
+                System.out.println(PrintColor.ANSI_PURPLE + "[CLASE PASAJERO]" + toString() + " no va a ver la tienda porque no tiene tiempo o no quiere." + PrintColor.ANSI_RESET);
             }
 
-            if (((horaActual + 3 <= horaVuelo) || (horaActual > horaVuelo))
-                    && (quiereComprarTienda && quiereVerTienda)) {
+            if (((horaActual + 3 <= horaVuelo) || (horaActual > horaVuelo)) && (quiereComprarTienda && quiereVerTienda)) {
                 ArrayList<Producto> carro = new ArrayList<>();
                 Caja caja = tienda.obtenerCaja(this);
 
@@ -86,14 +83,12 @@ public class Pasajero extends Persona implements Runnable {
 
                 tienda.salirTienda(this);
             } else {
-                System.out.println(PrintColor.ANSI_PURPLE + toString() + "[CLASE PASAJERO]"
-                        + " no va a comprar en la tienda porque no tiene tiempo o no quiere." + PrintColor.ANSI_RESET);
+                System.out.println(PrintColor.ANSI_PURPLE + toString() + "[CLASE PASAJERO]" + " no va a comprar en la tienda porque no tiene tiempo o no quiere." + PrintColor.ANSI_RESET);
             }
 
             // espera vuelo
             terminal.esperarVuelo(this);
-            System.out.println(
-                    PrintColor.ANSI_PURPLE + "[CLASE PASAJERO]" + toString() + " ha tomado su vuelo. Adios! :)" + PrintColor.ANSI_RESET);
+            System.out.println( PrintColor.ANSI_PURPLE + "[CLASE PASAJERO]" + toString() + " ha tomado su vuelo. Adios! :)" + PrintColor.ANSI_RESET);
         } catch (InterruptedException ex) {
             System.out.println("Error en Pasajero.run: " + ex.getMessage());
         }

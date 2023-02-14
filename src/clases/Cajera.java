@@ -19,18 +19,18 @@ public class Cajera extends Persona implements Runnable {
     @Override
     public void run() {
         // Metodo que indica la accion que realiza la cajera
-        while (true) {
-            try {
+        try {
+            while (true) {
                 Producto producto = caja.cobrarProducto(this);
                 System.out.println(PrintColor.ANSI_CYAN + "[CLASE CAJERA] "
                         + "La cajera: " + toString() + " de la caja: " + caja.getId()
                         + " esta cobrando el producto " + producto.getId()
-                        + " al cliente: " + caja.getClienteActual()+ PrintColor.ANSI_RESET);
+                        + " al cliente: " + caja.getClienteActual() + PrintColor.ANSI_RESET);
                 Thread.sleep(100);
                 producto.restarStock();
-            } catch (InterruptedException ex) {
-                System.out.println("Error en Cajera.run " + ex.getMessage());
             }
+        } catch (InterruptedException ex) {
+            System.out.println("Error en Cajera.run " + ex.getMessage());
         }
     }
 

@@ -37,16 +37,18 @@ public class Caja {
 
     // Metodos para Pasajeros ------------------------------------------------------
     public void hacerFila(Pasajero pasajero) {
+        // Se utiliza un semaforo para controlar que haya 1 solo pasajero en la caja
         try {
             caja.acquire();
+            clienteActual = pasajero;
+            System.out.println(PrintColor.ANSI_BLUE + "[CLASE CAJA]: " + clienteActual + " ingreso a la caja " + id + "." + PrintColor.ANSI_RESET);
         } catch (InterruptedException ex) {
             System.out.println("Error en Caja.hacerFila " + ex.getMessage());
         }
-        clienteActual = pasajero;
-        System.out.println(PrintColor.ANSI_BLUE + "[CLASE CAJA]: " + clienteActual + " ingreso a la caja " + id + "." + PrintColor.ANSI_RESET);
     }
 
     public void ponerProductosCinta(ArrayList<Producto> carrito) {
+        // Se utiliza un lock explicito para controlar los accesos a la cinta
         lock.lock();
         try {
             int tamanioCarrito = carrito.size();
@@ -63,21 +65,21 @@ public class Caja {
     }
 
     public void procesarCompra() {
+        // Se utiliza un una condicion para notificar a la cajera que el cliente ya puso todos los productos en la cinta
         lock.lock();
         try {
             while (cantActualCinta > 0) {
-                try {
-                    conditionPasajero.await();
-                } catch (InterruptedException ex) {
-                    System.out.println("Error en Caja.procesarCompra " + ex.getMessage());
-                }
+                conditionPasajero.await();
             }
+        } catch (InterruptedException ex) {
+            System.out.println("Error en Caja.procesarCompra " + ex.getMessage());
         } finally {
             lock.unlock();
         }
     }
 
     public void salirCaja() {
+        // Se libera el acceso a la caja
         System.out.println(PrintColor.ANSI_BLUE + "[CLASE CAJA]: " + clienteActual + " termino de pagar en la caja " + id + "." + PrintColor.ANSI_RESET);
         clienteActual = null;
         caja.release();
@@ -85,14 +87,11 @@ public class Caja {
 
     // Metodos para Cajera ---------------------------------------------------------
     public Producto cobrarProducto(Cajera cajera) {
-        // La cajera obtiene un producto de la cinta
-        // Se utiliza lock para manejar la exclusion mutua
+        // Se utiliza un una condicion para notificar al cliente que la cajera ya cobro un producto
         lock.lock();
         Producto producto = null;
         try {
             while (cantActualCinta == 0) {
-                // La Condition de la cajera se activa cuando el cliente puso todos los
-                // productos en la cinta y este avisa
                 conditionCajera.await();
             }
             producto = cinta.get(0);
@@ -100,13 +99,11 @@ public class Caja {
             Thread.sleep(1000);
             cinta.remove(0);
             if (cantActualCinta == 0) {
-                // Si la cinta esta vacia, avisa al pasajero para que pueda salir de la caja
                 conditionPasajero.signal();
             }
         } catch (InterruptedException ex) {
             System.out.println("Error en Caja.obtenerProductoCinta " + ex.getMessage());
         } finally {
-            // Se libera el lock
             lock.unlock();
         }
         return producto;

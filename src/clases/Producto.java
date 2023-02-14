@@ -23,9 +23,10 @@ public class Producto {
      * tiempo
      */
     public synchronized void restarStock() {
+        // Se sincroniza para mantener la consistencia de los datos
         this.stock -= 1;
     }
-
+    
     // Metodos para Repositor --------------------------------------------------
     /**
      * Metodo sincronizado para que no entren dos repositores a agregar stock al
@@ -34,6 +35,7 @@ public class Producto {
      * @param cantidad productos agregados
      */
     public synchronized void agregarStock(int cantidad) {
+        // Se sincroniza para mantener la consistencia de los datos
         this.stock += cantidad;
     }
 

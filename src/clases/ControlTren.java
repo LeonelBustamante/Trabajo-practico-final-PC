@@ -40,14 +40,17 @@ public class ControlTren {
      * @param pasajero El pasajero que desea subir al tren
      */
     public void pasajeroSubeAlTren(Pasajero pasajero) throws InterruptedException {
+        //Se utiliza un semaforo para que los pasajeros entren de a uno
         permisoSubirTren.acquire();
 
+        // Se utiliza un mutex para controlar el acceso a la variable cantPasajerosEnTren
         mutex.acquire();
         prints.add(pasajero + " subio al tren.");
         cantPasajerosEnTren.incrementAndGet();
         controlarBajadaEnEstacion(pasajero.getReserva().getTerminal().getLetra());
         mutex.release();
 
+        // Se libera un permiso para que el tren pueda arrancar
         permisoArrancarTren.release();
     }
 
@@ -77,6 +80,7 @@ public class ControlTren {
      * @param pasajero El pasajero que desea bajar del tren.
      */
     public void bajarDeTren(Pasajero pasajero) {
+        // Se libera un permiso para que el tren vuelva a la estacion de origen
         semVolverInicio.release();
         cantPasajerosEnTren.decrementAndGet();
         prints.add(pasajero + " se bajo del tren. Quedan " + cantPasajerosEnTren.get() + " pasajeros en el tren.");
@@ -92,6 +96,7 @@ public class ControlTren {
     public void comenzarViaje() throws InterruptedException {
         Thread.sleep(1000);
         if (cantPasajerosEnTren.get() < capacidadTren) {
+            // Se adquieren los permisos sobrantes para que no se suba un pasajero cuando el tren no esta y se libera un permiso para que el tren pueda arrancar 
             int cantPasajerosFaltantes = capacidadTren - cantPasajerosEnTren.get();
             permisoSubirTren.acquire(cantPasajerosFaltantes);
             semVolverInicio.release(cantPasajerosFaltantes);
@@ -113,6 +118,7 @@ public class ControlTren {
      *                         terminales.
      */
     public void arriboTerminal(char terminalArribada, Semaphore[] semaforos) throws InterruptedException {
+        // Se utiliza un mutex para controlar el acceso a la variable cantPasajerosEnTren
         mutex.acquire();
         int puntero = PRIMER_TERMINAL;
         int ultimaTerminal = cantTerminales + PRIMER_TERMINAL;
@@ -136,15 +142,16 @@ public class ControlTren {
      * Este metodo permite que el tren regrese a la primera parada.
      */
     public void volverPrimerParada() throws InterruptedException {
+        // Se constata que el tren este vacio y se vuelva a la primera parada
         semVolverInicio.acquire(capacidadTren);
-        prints.add("******El tren regresa a la primera parada. Quedan {} pasajeros en el tren."
-                + cantPasajerosEnTren.get());
+        prints.add("******El tren regresa a la primera parada. Quedan {} pasajeros en el tren." + cantPasajerosEnTren.get());
     }
 
     /**
      * Este metodo permite que el tren llegue a la primera parada.
      */
     public void llegoOrigen() {
+        // Se liberan los permisos para que suban los nuevos pasajeros
         permisoSubirTren.release(capacidadTren);
     }
 

@@ -40,8 +40,7 @@ public class Reloj implements Runnable {
             try {
                 Thread.sleep(4000);
                 hora.addAndGet(1);
-                System.out.println(PrintColor.ANSI_YELLOW + "[CLASE RELOJ] Hora actual: "
-                        + Handler.formatoHora(hora.get()) + " hs"+ PrintColor.ANSI_RESET);
+                System.out.println(PrintColor.ANSI_YELLOW + "[CLASE RELOJ] Hora actual: " + Handler.formatoHora(hora.get()) + " hs" + PrintColor.ANSI_RESET);
 
                 switch (hora.get()) {
                     case INICIO_ATENCION -> {
@@ -54,7 +53,7 @@ public class Reloj implements Runnable {
                     }
                     case NUEVO_DIA -> {
                         hora.set(0);
-                        System.out.println(PrintColor.ANSI_YELLOW + "[CLASE RELOJ] Comienza un nuevo día"+ PrintColor.ANSI_RESET);
+                        System.out.println( PrintColor.ANSI_YELLOW + "[CLASE RELOJ] Comienza un nuevo día" + PrintColor.ANSI_RESET);
                     }
                     default -> {
                     }

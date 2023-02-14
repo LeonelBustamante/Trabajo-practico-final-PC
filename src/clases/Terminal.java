@@ -36,6 +36,7 @@ public class Terminal {
      * @param pasajero pasajero que espera el vuelo
      */
     public synchronized void esperarVuelo(Pasajero pasajero) {
+        // Metodo con lock implicito donde se utiliza al objeto this como lock
         while (hora.get() != pasajero.getReserva().getHora()) {
             try {
                 System.out.println(PrintColor.ANSI_CYAN_BACKGROUND + "[CLASE TERMINAL]"
@@ -56,6 +57,7 @@ public class Terminal {
      * terminal.
      */
     public synchronized void pasarHora() {
+        // Metodo con lock implicito que despierta a todos los hilos que estan esperando
         notifyAll();
     }
 

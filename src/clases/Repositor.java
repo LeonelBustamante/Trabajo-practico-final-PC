@@ -41,6 +41,7 @@ public class Repositor extends Persona implements Runnable {
      * <HORA_REPONER>, el hilo se bloqueará esperando una notificación.
      */
     private synchronized void reponerProductosTiendas() {
+        // Metodo con lock implicito donde se utiliza al objeto this como lock
         while (hora.get() != HORA_REPONER) {
             try {
                 wait();
@@ -62,6 +63,7 @@ public class Repositor extends Persona implements Runnable {
      * esperan una notificación.
      */
     public synchronized void notificarCambioHora() {
+        // Metodo con lock implicito que despertara al hilo Repositor
         notify();
     }
 }

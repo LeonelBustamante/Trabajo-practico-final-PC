@@ -15,13 +15,13 @@ public class Recepcionista extends Persona implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            try {
+        try {
+            while (true) {
                 puesto.hacerPasarPasajero();
                 Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                System.out.println("Error en Recepcionista.run: " + ex.getMessage());
             }
+        } catch (InterruptedException ex) {
+            System.out.println("Error en Recepcionista.run: " + ex.getMessage());
         }
     }
 

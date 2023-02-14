@@ -73,7 +73,7 @@ public class Tren implements Runnable {
      * @param terminalPasajero terminal solicitada por el pasajero
      */
     public void solicitarViajeATerminal(char terminalPasajero) {
-        // El pasajero solicita traslado a la terminal
+        // metodo que utiliza el seemaforo para que se bajen los pasajeros en la terminal que corresponda
         int cantTotal = terminales.length + PRIMER_TERMINAL;
         int indice;
         for (int terminalActual = PRIMER_TERMINAL; terminalActual < cantTotal; terminalActual++) {
